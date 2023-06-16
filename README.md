@@ -1,1 +1,0 @@
-# fastapi-sql-profiler
