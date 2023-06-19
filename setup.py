@@ -1,11 +1,12 @@
 from setuptools import setup
 
 setup(
-    name='database-query-profiling-middleware',
+    name='fastapi-sql-profiler',
     version='1.0.0',
     description='Middleware for profiling and logging database queries in a Python web application',
-    author='abc',
-    author_email='abc@example.com',
+    author='Ganesh Sali',
+    author_email='ganesh@sarvadhi.com',
+    url="https://github.com/Sarvadhi-Solutions/fastapi-sql-profiler.git",
     install_requires=[
         "fastapi >= 0.97.0",
         "SQLAlchemy >= 2.0.16",

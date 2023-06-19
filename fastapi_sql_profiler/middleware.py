@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 
+
 class SessionHandler(object):
     """Handler for SQLAlchemy session profiling.
 
@@ -109,7 +110,7 @@ class SessionHandler(object):
         sqlalchemy.event.remove(self.engine, "after_execute", self._after_exec)
 
 
-class DBMiddleware(BaseHTTPMiddleware):
+class SQLProfilerMiddleware(BaseHTTPMiddleware):
     """Middleware for database profiling.
 
     Args:
@@ -131,7 +132,7 @@ class DBMiddleware(BaseHTTPMiddleware):
     """
 
     def __init__(self, app, base, engine) -> None:
-        """Initialize a DBMiddleware object.
+        """Initialize a SQLProfilerMiddleware object.
 
         Args:
         ----

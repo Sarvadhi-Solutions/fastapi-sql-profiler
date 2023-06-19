@@ -1,7 +1,7 @@
 import unittest
 from sqlalchemy import Column, Integer, String, create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
-from mymid.middleware import DBMiddleware
+from fastapi_sql_profiler.middleware import SQLProfilerMiddleware
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
@@ -31,7 +31,7 @@ class TestSQLTap(unittest.TestCase):
 
         Base.metadata.create_all(bind=self.engine)
         self.Session = sessionmaker(bind=self.engine)
-        self.app.add_middleware(DBMiddleware, base=Base, engine=self.engine)
+        self.app.add_middleware(SQLProfilerMiddleware, base=Base, engine=self.engine)
 
     def insert_api(self):
         @self.app.post('/item_create')

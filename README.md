@@ -11,19 +11,19 @@ This project is a middleware implementation for profiling and logging database q
 
 ## Installation
 
-pip install library-name
+pip install fastapi-sql-profiler
 
 ## Usage:
 
 ```python
-from mymid.middleware import DBMiddleware
+from fastapi_sql_profiler.middleware import SQLProfilerMiddleware
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 
 app = FastAPI()
 base = declarative_base()
 engine = create_engine("your-database-connection-string")
-app.add_middleware(DBMiddleware, base=Base, engine=engine)
+app.add_middleware(SQLProfilerMiddleware, base=Base, engine=engine)
 ```
 
 ## Contributing
