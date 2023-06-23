@@ -5,6 +5,7 @@ from fastapi_sql_profiler.middleware import SQLProfilerMiddleware
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
+from fastapi_sql_profiler.database import Base, engine
 
 
 class TestSQLTap(unittest.TestCase):
@@ -12,8 +13,8 @@ class TestSQLTap(unittest.TestCase):
     def setUp(self):
         self.app = FastAPI()
         self.client = TestClient(self.app)
-        self.engine = create_engine("sqlite:///./app.db", echo=True)
-        Base = declarative_base()
+        self.engine = engine
+        # Base = declarative_base()
         class Item(Base):
             __tablename__ = "item"
             id = Column("id", Integer, primary_key=True)
@@ -31,7 +32,7 @@ class TestSQLTap(unittest.TestCase):
 
         Base.metadata.create_all(bind=self.engine)
         self.Session = sessionmaker(bind=self.engine)
-        self.app.add_middleware(SQLProfilerMiddleware, base=Base, engine=self.engine)
+        self.app.add_middleware(SQLProfilerMiddleware, engine=self.engine)
 
     def insert_api(self):
         @self.app.post('/item_create')
