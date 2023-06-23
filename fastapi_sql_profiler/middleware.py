@@ -3,10 +3,11 @@ import time
 import traceback
 
 import sqlalchemy.event
-from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import sessionmaker
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
+
+from .database import session
+from .models import QueryInfo, RequestInfo
 
 
 class SessionHandler(object):
@@ -88,7 +89,6 @@ class SessionHandler(object):
         if self.started is True:
             msg = "Profiling session is already started!"
             raise AssertionError(msg)
-
         self.started = True
         sqlalchemy.event.listen(self.engine, "before_execute",
                                 self._before_exec)
@@ -131,7 +131,7 @@ class SQLProfilerMiddleware(BaseHTTPMiddleware):
 
     """
 
-    def __init__(self, app, base, engine) -> None:
+    def __init__(self, app, engine) -> None:
         """Initialize a SQLProfilerMiddleware object.
 
         Args:
@@ -142,51 +142,9 @@ class SQLProfilerMiddleware(BaseHTTPMiddleware):
 
         """
         self.app = app
-        self.base = base
         self.engine = engine
-        self.Session = sessionmaker(bind=self.engine)
-        self.create_middleware_table()
         self.dispatch_func = self.dispatch
         self.queries = []
-    
-    def create_middleware_table(self):
-        """Create the middleware table.
-
-        This function defines and creates two tables:
-        - 'middleware_requests' table with columns 'id', 'path', 'query_params', 'raw_body', 'body', 'method',
-        'start_time', 'end_time', 'time_taken', and 'total_queries'.
-        - 'middleware_query' table with columns 'id', 'query', 'time_taken', 'traceback', and 'request_id'.
-
-        """
-        class RequestInfo(self.base):
-            __tablename__ = 'middleware_requests'
-
-            id = Column(Integer, primary_key=True, index=True)
-            path = Column(String(200))
-            query_params = Column(Text, default='')
-            raw_body = Column(Text, default='')
-            body = Column(Text, default='')
-            method = Column(String(10))
-            start_time = Column(DateTime, nullable=True)
-            end_time = Column(DateTime, nullable=True)
-            time_taken = Column(Float, nullable=True)
-            total_queries = Column(Integer)
-
-        class QueryInfo(self.base):
-            __tablename__ = 'middleware_query'
-            id = Column(Integer, primary_key=True, index=True)
-            query = Column(Text, nullable=True)
-            time_taken = Column(Float, nullable=True)
-            traceback = Column(Text, nullable=True)
-
-            request_id = Column(Integer, ForeignKey(
-                'middleware_requests.id'), nullable=False, index=True)
-
-        # Create the table if it doesn't exist
-        RequestInfo.__table__.create(self.engine, checkfirst=True)
-        self.RequestInfo = RequestInfo
-        QueryInfo.__table__.create(self.engine, checkfirst=True)
-        self.QueryInfo = QueryInfo
 
     def add_request(self, request, raw_body, body):
         """Add a new request to the 'middleware_requests' table.
@@ -205,9 +163,9 @@ class SQLProfilerMiddleware(BaseHTTPMiddleware):
         method = request.method
         path = request.url.path
         query_params = str(request.query_params)
-        session = self.Session()
-        request_info = self.RequestInfo(path=path, query_params=query_params, raw_body=raw_body,
-                                        body=body, method=method, start_time=datetime.datetime.utcnow())
+        headers_json = dict(request.headers)
+        request_info = RequestInfo(path=path, query_params=query_params, raw_body=raw_body,
+                                   body=body, method=method, start_time=datetime.datetime.utcnow(), headers=headers_json)
         session.add(request_info)
         session.commit()
         session.refresh(request_info)
@@ -222,20 +180,21 @@ class SQLProfilerMiddleware(BaseHTTPMiddleware):
         request_id (int): The ID of the request being profiled.
 
         """
-        
-        session = self.Session()
         for query_obj in session_handler.query_objs:
             time_taken = query_obj['end_time'] - query_obj['start_time']
-            query_data = self.QueryInfo(query=str(
-                query_obj['text']), request_id=request_id, time_taken=time_taken, traceback=query_obj['stack'])
+            mstimetaken = round(time_taken*1000)
+            query_data = QueryInfo(query=str(
+                query_obj['text']), request_id=request_id, time_taken=mstimetaken, traceback=query_obj['stack'])
             session.add(query_data)
             session.commit()
             session.close()
         end_time = datetime.datetime.utcnow()
-        request_obj = session.get(self.RequestInfo, request_id)
+        request_obj = session.get(RequestInfo, request_id)
         time_taken = end_time - request_obj.start_time
+        time_taken_second = time_taken.total_seconds()
+        time_taken_ms = round(time_taken_second*1000)
         request_obj.end_time = end_time
-        request_obj.time_taken = time_taken.total_seconds()
+        request_obj.time_taken = time_taken_ms
         request_obj.total_queries = len(session_handler.query_objs)
         session.add(request_obj)
         session.commit()
@@ -292,14 +251,16 @@ class SQLProfilerMiddleware(BaseHTTPMiddleware):
         else:
             raw_body = ''
             body = ''
-        requset_data = self.add_request(request, raw_body, body)
-        request_id = requset_data.id
-        engine = self.engine
-        session_handler = SessionHandler(engine)
-        session_handler.start()
-        response = await call_next(request)
-        session_handler.stop()
-        # print("After Request")
-        self.store(session_handler, request_id)
+        request_path = request.url.path
+        if request_path == '/all_request' or request_path.startswith(('/request_detail', '/request_query')):
+            response = await call_next(request)
+        else:
+            requset_data = self.add_request(request, raw_body, body)
+            request_id = requset_data.id
+            session_handler = SessionHandler(self.engine)
+            session_handler.start()
+            response = await call_next(request)
+            session_handler.stop()
+            # print("After Request")
+            self.store(session_handler, request_id)
         return response
-

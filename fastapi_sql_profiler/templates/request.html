@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="d-flex flex-column align-items-center justify-content-center mt-4">
+    <div><span class="badge {% if request_query.method == 'GET' %}bg-success{% elif request_query.method == 'POST' %}bg-warning{% elif request_query.method == 'DELETE' %}bg-danger{% elif request_query.method == 'PUT' %}bg-info{% else %}bg-secondary{% endif %}">{{ request_query.method }}</span></div>
+    <div>{{ request_query.path }}</div>
+    <div>{{ request_query.time_taken }} ms overall</div>
+    <div>{{ sum_on_query }} ms on queries</div>
+    <div>{{ request_query.total_queries }} queries</div>
+    <div class="card mt-4" style="width: 70%;">
+        <div class="card-header">Request Headers</div>
+        <div class="card-body" style="overflow: auto;">
+            <table class="headers">
+                <tbody>
+                    {% if request_query.headers['content-length'] %}
+                    <tr>
+                        <th style="white-space: nowrap;">
+                            <span style="display: inline;">CONTENT-LENGTH</span>
+                        </th>
+                        <td class="value" style="padding-left: 20px;">{{ request_query.headers['content-length'] }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if request_query.headers['content-type'] %}
+                    <tr>
+                        <th style="white-space: nowrap;">
+                            <span style="display: inline;">CONTENT-TYPE</span>
+                        </th>
+                        <td class="value" style="padding-left: 20px;">{{ request_query.headers['content-type'] }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if request_query.headers['host'] %}
+                    <tr>
+                        <th style="white-space: nowrap;">
+                            <span style="display: inline;">HOST</span>
+                        </th>
+                        <td class="value" style="padding-left: 20px;">{{ request_query.headers['host'] }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if request_query.headers['connection'] %}
+                    <tr>
+                        <th style="white-space: nowrap;">
+                            <span style="display: inline;">CONNECTION</span>
+                        </th>
+                        <td class="value" style="padding-left: 20px;">{{ request_query.headers['connection'] }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if request_query.headers['accept'] %}
+                    <tr>
+                        <th style="white-space: nowrap;">
+                            <span style="display: inline;">ACCEPT</span>
+                        </th>
+                        <td class="value" style="padding-left: 20px;">{{ request_query.headers['accept'] }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if request_query.headers['user-agent'] %}
+                    <tr>
+                        <th style="white-space: nowrap;">
+                            <span style="display: inline;">USER-AGENT</span>
+                        </th>
+                        <td class="value" style="padding-left: 20px;">{{ request_query.headers['user-agent'] }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if request_query.headers['accept-encoding'] %}
+                    <tr>
+                        <th style="white-space: nowrap;">
+                            <span style="display: inline;">ACCEPT-ENCODING</span>
+                        </th>
+                        <td class="value" style="padding-left: 20px;">{{ request_query.headers['accept-encoding'] }}</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if request_query.query_params %}
+    <div class="card mt-4" style="width: 70%;">
+        <div class="card-header">Query Params</div>
+        <div class="card-body">
+            <p>{{ request_query.query_params }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if request_query.raw_body %}
+    <div class="card mt-4" style="width: 70%;">
+        <div class="card-header">Raw Request Body</div>
+        <div class="card-body">
+            <p>{{ request_query.raw_body }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if request_query.body %}
+    <div class="card mt-4" style="width: 70%;">
+        <div class="card-header">Request Body</div>
+        <div class="card-body">
+            <p>{{ request_query.body }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

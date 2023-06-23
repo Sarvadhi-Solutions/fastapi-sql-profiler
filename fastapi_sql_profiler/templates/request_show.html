@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row row-cols-1 row-cols-md-5 g-4 mt-2 px-4">
+    {% for request_info in request_info %}
+    <div class="col">
+        <a style="text-decoration: none;" href="{{ url_for('request_show', id=request_info.id) }}">
+            <div class="card border-2 border-secondary shadow">
+                <div class="card-body">
+                    <h5 class="card-title mb-2">
+                        <span class="badge {% if request_info.method == 'GET' %}bg-success{% elif request_info.method == 'POST' %}bg-warning{% elif request_info.method == 'DELETE' %}bg-danger{% elif request_info.method == 'PUT' %}bg-info{% else %}bg-secondary{% endif %}">
+                            {{ request_info.method }}
+                        </span>
+                    </h5>
+                    <div class="card-text">
+                        <strong>Path:</strong> {{ request_info.path }}
+                    </div>
+                    <div class="card-text">
+                        <strong>Time Taken:</strong> {{ request_info.time_taken }} ms overall
+                    </div>
+                    <div class="card-text">
+                        <strong>Total Queries:</strong> {{ request_info.total_queries }} queries
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<nav>
+    <ul class="pagination justify-content-center mt-4">
+        {% if page > 1 %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page - 1 }}&limit={{ limit }}">Previous</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+        </li>
+        {% endif %}
+
+        {% if page < total_pages %} <li class="page-item">
+            <a class="page-link" href="?page={{ page + 1 }}&limit={{ limit }}">Next</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+            </li>
+            {% endif %}
+    </ul>
+</nav>
+{% endblock %}

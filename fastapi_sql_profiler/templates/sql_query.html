@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="d-flex flex-column align-items-center justify-content-center mt-4">
+    <div><span class="badge {% if request_query.method == 'GET' %}bg-success{% elif request_query.method == 'POST' %}bg-warning{% elif request_query.method == 'DELETE' %}bg-danger{% elif request_query.method == 'PUT' %}bg-info{% else %}bg-secondary{% endif %}">{{ request_query.method }}</span></div>
+    <div>{{ request_query.path }}</div>
+    <div>{{ request_query.time_taken }} ms overall</div>
+    <div>{{ sum_on_query }} ms on queries</div>
+    <div>{{ request_query.total_queries }} queries</div>
+    <table class="table table-borderless table-hover mt-4" style="width: 70%;">
+        <thead>
+            <tr>
+                <th scope="col" style="text-align: center;">num</th>
+                <th scope="col" style="text-align: center;">Action</th>
+                <th scope="col" style="text-align: center;">Execution Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for query_detail in query_detail%}
+            <tr onclick="window.location.href = '{{ url_for('request_query_details', id=query_detail.id) }}';">
+                <td class="value" style="text-align: center;"><a style="text-decoration: none; color: black;" href="{{ url_for('request_query_details', id=query_detail.id) }}">{{ loop.index }}</a></td>
+                <td class="value" style="text-align: center;"><a style="text-decoration: none; color: black; display: inline-block; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" href="{{ url_for('request_query_details', id=query_detail.id) }}">{{ query_detail.query }}</a></td>
+                <td class="value" style="text-align: center;"><a style="text-decoration: none; color: black;" href="{{ url_for('request_query_details', id=query_detail.id) }}">{{ query_detail.time_taken }}</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</div>
+{% endblock %}
