@@ -4,6 +4,7 @@ setup(
     name='fastapi-sql-profiler',
     version='1.0.0',
     description='Middleware for profiling and logging database queries in a Python web application',
+    package_data={'fastapi_sql_profiler': ['templates/*']},
     author='Ganesh Sali',
     author_email='ganesh@sarvadhi.com',
     url="https://github.com/Sarvadhi-Solutions/fastapi-sql-profiler.git",

@@ -13,13 +13,13 @@
                             {{ request_info.method }}
                         </span>
                     </h5>
-                    <div class="card-text">
+                    <div class="card-text" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                         <strong>Path:</strong> {{ request_info.path }}
                     </div>
-                    <div class="card-text">
-                        <strong>Time Taken:</strong> {{ request_info.time_taken }} ms overall
+                    <div class="card-text" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        <strong>Time Taken:</strong> {{ request_info.time_taken }} ms
                     </div>
-                    <div class="card-text">
+                    <div class="card-text" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                         <strong>Total Queries:</strong> {{ request_info.total_queries }} queries
                     </div>
                 </div>

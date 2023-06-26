@@ -182,7 +182,7 @@ class SQLProfilerMiddleware(BaseHTTPMiddleware):
         """
         for query_obj in session_handler.query_objs:
             time_taken = query_obj['end_time'] - query_obj['start_time']
-            mstimetaken = round(time_taken*1000)
+            mstimetaken = round(time_taken*1000, 3)
             query_data = QueryInfo(query=str(
                 query_obj['text']), request_id=request_id, time_taken=mstimetaken, traceback=query_obj['stack'])
             session.add(query_data)
@@ -192,7 +192,7 @@ class SQLProfilerMiddleware(BaseHTTPMiddleware):
         request_obj = session.get(RequestInfo, request_id)
         time_taken = end_time - request_obj.start_time
         time_taken_second = time_taken.total_seconds()
-        time_taken_ms = round(time_taken_second*1000)
+        time_taken_ms = round(time_taken_second*1000, 3)
         request_obj.end_time = end_time
         request_obj.time_taken = time_taken_ms
         request_obj.total_queries = len(session_handler.query_objs)
@@ -252,7 +252,7 @@ class SQLProfilerMiddleware(BaseHTTPMiddleware):
             raw_body = ''
             body = ''
         request_path = request.url.path
-        if request_path == '/all_request' or request_path.startswith(('/request_detail', '/request_query')):
+        if request_path == '/all_request' or request_path.startswith(('/request_detail', '/request_query','/favicon')):
             response = await call_next(request)
         else:
             requset_data = self.add_request(request, raw_body, body)

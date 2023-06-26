@@ -4,7 +4,7 @@ This project is a middleware implementation for profiling and logging database q
 
 ## Features
 
-    * Profiles and logs database queries made within the web application.
+    * Logs database queries made within the web application.
     * Captures query execution times, query texts, and stack traces.
     * Stores query information in a database table along with request details.
     * Provides insights into query performance for debugging and optimization.
