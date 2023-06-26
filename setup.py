@@ -10,6 +10,9 @@ setup(
     install_requires=[
         "fastapi >= 0.97.0",
         "SQLAlchemy >= 2.0.16",
+        "python-dotenv >= 1.0.0",
+        "Jinja2 >= 3.1.2",
+        "python-multipart >= 0.0.6"
     ],
     classifiers=[
           'Development Status :: 5 - Production/Stable',

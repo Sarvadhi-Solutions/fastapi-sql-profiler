@@ -14,17 +14,29 @@ This project is a middleware implementation for profiling and logging database q
 pip install fastapi-sql-profiler
 
 ## Usage:
-
+Update the database connection URL in the .env file.
+```python
+SQLALCHEMY_DATABASE_URL=<database_connection_url>
+```
 ```python
 from fastapi_sql_profiler.middleware import SQLProfilerMiddleware
+from fastapi_sql_profiler.add_request import router
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 
 app = FastAPI()
 base = declarative_base()
 engine = create_engine("your-database-connection-string")
-app.add_middleware(SQLProfilerMiddleware, base=Base, engine=engine)
+app.include_router(router)
+app.add_middleware(SQLProfilerMiddleware, engine=engine)
 ```
+
+## Endpoints
+
+    * `GET /all_request`: Displays all captured requests with pagination support.
+    * `GET /request_detail/{id}`: Displays details of a specific request identified by its ID.
+    * `GET /request_query/{id}`: Displays the queries associated with a specific request identified its ID.
+    * `GET /request_query_details/{id}`: Displays details of a specific query identified by its ID.
 
 ## Contributing
 
