@@ -1,11 +1,13 @@
 import unittest
-from sqlalchemy import Column, Integer, String, create_engine, text
-from sqlalchemy.orm import sessionmaker, declarative_base
+import json
+from sqlalchemy import Column, Integer, String, text
+from sqlalchemy.orm import sessionmaker
 from fastapi_sql_profiler.middleware import SQLProfilerMiddleware
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
 from fastapi_sql_profiler.database import Base, engine
+from fastapi_sql_profiler.models import RequestInfo  
 
 
 class TestSQLTap(unittest.TestCase):
@@ -41,6 +43,11 @@ class TestSQLTap(unittest.TestCase):
             item_data = self.Item(name=itemschema.name, description=itemschema.description)
             session.add(item_data)
             session.commit()
+            request_info = session.query(RequestInfo).order_by(-RequestInfo.id).first()
+            assert request_info.path == '/item_create'
+            assert request_info.method == 'POST'
+            assert request_info.body == json.dumps(itemschema.dict())
+            assert request_info.total_queries == 1
             return item_data
         payload = {
             'name':'item1',
@@ -53,6 +60,11 @@ class TestSQLTap(unittest.TestCase):
         @self.app.get("/item_get")
         def show():
             session = self.Session()
+            request_infos = session.query(RequestInfo).all()
+            for request_info in request_infos:
+                assert request_info.query_params == "test"
+                assert request_info.path == '/item_get'
+
             return session.query(self.Item).all()
         response = self.client.get('/item_get')
         return response
@@ -64,16 +76,21 @@ class TestSQLTap(unittest.TestCase):
             item = session.query(self.Item).filter_by(id=id).first()
             if not item:
                 return {"message":f"Item with the id {id} is not available"}
-            item.name = itemschema.name
+            item.name = itemschema.name 
             item.description = itemschema.description
             session.add(item)
             session.commit()
+            request_info = session.query(RequestInfo).order_by(-RequestInfo.id).first()
+            assert request_info.path == '/item_update/24'
+            assert request_info.method == 'PUT'
+            assert request_info.body == json.dumps(itemschema.dict())
+            assert request_info.total_queries == 1
             return item
         payload = {
             'name':'itemupdate',
             'description':'updateditem'
         }
-        response = self.client.put('/item_update/1', json=payload)
+        response = self.client.put('/item_update/24', json=payload)
         return response
 
     def delete_api(self):
@@ -84,6 +101,9 @@ class TestSQLTap(unittest.TestCase):
             if not item.first():
                 return {"message":f"Item with the id {id} is not available"}
             item.delete()
+            session.commit()
+            request_info = RequestInfo(path="/item_delete/{id}",query_params=f"id={id}",method="DELETE")
+            session.add(request_info)
             session.commit()
             return {"message": "Item delete Successfully"}
         response = self.client.delete('/item_delete/1')
