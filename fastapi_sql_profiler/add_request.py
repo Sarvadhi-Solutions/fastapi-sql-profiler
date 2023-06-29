@@ -1,8 +1,8 @@
 import os
 import math
 from pathlib import Path
-from fastapi import APIRouter, Request
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Request, status
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
 from .database import session
@@ -85,3 +85,13 @@ def request_query_details(id: int, request: Request):
     virtualenv_path = os.environ.get('VIRTUAL_ENV')
     context = {"request": request,"query_detail":query_detail,"traceback":traceback,"virtualenv_path":virtualenv_path,"current_api": "request_query_details"}
     return templates.TemplateResponse("sql_query_detail.html", context)
+
+
+@router.delete('/clear_db')
+def destory(requset: Request):
+    """Clear DB."""
+    session.query(RequestInfo).delete()
+    session.query(QueryInfo).delete()
+    session.commit()
+    return JSONResponse(content={"message": "Clear Db Successfully"},
+                        status_code=status.HTTP_200_OK)

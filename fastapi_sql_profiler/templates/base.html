@@ -15,17 +15,40 @@
 {% block style %}
 {% endblock %}
 
+<script>
+    function clearData() {
+        fetch('/clear_db', {
+            method: 'delete',
+        })
+            .then(response => {
+                console.log('clearData() called', response);
+                if (response.ok) {
+                    alert("Clearing all data...");
+                    setTimeout(() => {
+                        location.reload();
+                    }, 500);
+                } else {
+                    alert("Error clearing data.");
+                }
+            })
+            .catch(error => {
+                alert("An error occurred while clearing data.");
+            });
+
+    }
+</script>
+
 <body>
     <!-- Navigation Bar -->
     <header>
         {% if current_api == "all_request" %}
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
-                <a class="navbar-brand" href="{{ url_for('all_request') }}">Summary</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div>
+                    <a class="navbar-brand" href="{{ url_for('all_request') }}">Summary</a>
+                </div>
+                <div>
+                    <button class="btn btn-clear" data-bs-toggle="modal" onclick="clearData()">Clear DB</button>
                 </div>
             </div>
         </nav>

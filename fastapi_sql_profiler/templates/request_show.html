@@ -13,6 +13,9 @@
                             {{ request_info.method }}
                         </span>
                     </h5>
+                    <div class="card-text" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        {{ request_info.start_time }}
+                    </div>
                     <div class="card-text" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                         <strong>Path:</strong> {{ request_info.path }}
                     </div>
