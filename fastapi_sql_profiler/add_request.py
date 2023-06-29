@@ -1,6 +1,6 @@
+import os
 import math
 from pathlib import Path
-
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -26,11 +26,12 @@ async def all_request(request: Request,  page: int = 1, limit: int = 15):
     start_index = (page - 1) * limit
     end_index = start_index + limit
     request_info = all_request_info[start_index:end_index]
-    return templates.TemplateResponse("request_show.html", {"request": request, "request_info": request_info, "current_api": "all_request",
+    context = {"request": request, "request_info": request_info, "current_api": "all_request",
                                                             "page": page,
                                                             "limit": limit,
                                                             "total_pages": total_pages,
-                                                            })
+                                                            }
+    return templates.TemplateResponse("request_show.html", context)
 
 
 @router.get("/request_detail/{id}", response_class=HTMLResponse)
@@ -42,7 +43,8 @@ def request_show(id: int, request: Request):
     for query_details in query_detail:
         sum_on_query = sum_on_query + query_details.time_taken
     templates.env.globals['current_id'] = id
-    return templates.TemplateResponse("request.html", {"request": request, "request_query": request_query, "sum_on_query": sum_on_query})
+    context = {"request": request, "request_query": request_query, "sum_on_query": sum_on_query}
+    return templates.TemplateResponse("request.html", context)
 
 
 @router.get("/request_query/{id}", response_class=HTMLResponse)
@@ -54,11 +56,32 @@ def request_query(id: int, request: Request):
     for query_details in query_detail:
         sum_on_query = sum_on_query + query_details.time_taken
     templates.env.globals['current_id'] = id
-    return templates.TemplateResponse("sql_query.html", {"request": request, "request_query": request_query, "query_detail": query_detail, "sum_on_query": sum_on_query})
+    context = {"request": request, "request_query": request_query, "query_detail": query_detail, "sum_on_query": sum_on_query}
+    return templates.TemplateResponse("sql_query.html", context)
 
 
 @router.get("/request_query_details/{id}", response_class=HTMLResponse)
 def request_query_details(id: int, request: Request):
     """Get single request."""
     query_detail = session.query(QueryInfo).get(id)
-    return templates.TemplateResponse("sql_query_detail.html", {"request": request, "query_detail": query_detail, "current_api": "request_query_details"})
+    traceback_contents = query_detail.traceback.strip().splitlines()
+    traceback_groups = []
+    current_group = []
+
+    for traceback_content in traceback_contents:
+        if 'File "<string>"' not in traceback_content:
+            if traceback_content.startswith("  File"):
+                if current_group:
+                    traceback_groups.append(current_group)
+                    current_group = []
+            current_group.append(traceback_content)
+
+    if current_group:
+        traceback_groups.append(current_group)
+    traceback = []
+    for traceback_group in traceback_groups:
+        traceback_string = '\n'.join(traceback_group)
+        traceback.append(traceback_string)
+    virtualenv_path = os.environ.get('VIRTUAL_ENV')
+    context = {"request": request,"query_detail":query_detail,"traceback":traceback,"virtualenv_path":virtualenv_path,"current_api": "request_query_details"}
+    return templates.TemplateResponse("sql_query_detail.html", context)
