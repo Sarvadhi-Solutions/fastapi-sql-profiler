@@ -1,11 +1,24 @@
 {% extends 'base.html' %}
 
+{% block style %}
+<style>
+    .card-body{
+        font-size: small;
+    }
+    .file-path-is-third-party {
+            font-weight: bold;
+        }
+</style>
+    
+{% endblock %}
+
+
 {% block content %}
 <div id="d-flex flex-column" class="mt-4" style="padding-left: 225px;">
     <pre id="query" style="font-size: medium;"><code>{{ query_detail.query }}<br></code></pre>
     <div id="query-info-div">
         <div id="time-taken-div">
-            <span class="numeric">{{query_detail.time_taken}}<span class="unit"> ms on query</span></span>
+            <span class="numeric">{{query_detail.time_taken}}<span class="unit"> ms</span></span>
         </div>
     </div>
 </div>
@@ -17,7 +30,13 @@
             Traceback
         </div>
         <div class="card-body">
-            <pre style="white-space: pre-wrap; overflow-x: auto;">{{query_detail.traceback}}</pre>
+            {% for ln in traceback %}
+                {% if ln %}
+                    <div class="file-path-{% if virtualenv_path in ln %}not-{% else %}is-{% endif %}third-party">
+                        {{ ln }}
+                    </div>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
 

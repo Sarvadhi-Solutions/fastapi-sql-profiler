@@ -252,7 +252,7 @@ class SQLProfilerMiddleware(BaseHTTPMiddleware):
             raw_body = ''
             body = ''
         request_path = request.url.path
-        if request_path == '/all_request' or request_path.startswith(('/request_detail', '/request_query','/favicon')):
+        if request_path == '/all_request' or request_path.startswith(('/request_detail', '/request_query','/favicon','/clear_db')):
             response = await call_next(request)
         else:
             requset_data = self.add_request(request, raw_body, body)
