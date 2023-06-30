@@ -35,12 +35,19 @@ app.add_middleware(SQLProfilerMiddleware, engine=engine)
 ## Endpoints
 Please paste the following endpoints in the browser to see the results.
 1. `/all_request`: Displays all captured requests with pagination support.
+
     ![](https://github.com/Sarvadhi-Solutions/fastapi-sql-profiler/blob/main/doc/images/request.png)
+
 2. `/request_detail/{id}`: Displays details of a specific request identified by its ID.
+
     ![](https://github.com/Sarvadhi-Solutions/fastapi-sql-profiler/blob/main/doc/images/request_detail.png)
+
 3. `/request_query/{id}`: Displays the queries associated with a specific request identified its ID.
+
     ![](https://github.com/Sarvadhi-Solutions/fastapi-sql-profiler/blob/main/doc/images/query.png)
+
 4. `/request_query_details/{id}`: Displays details of a specific query identified by its ID.
+
     ![](https://github.com/Sarvadhi-Solutions/fastapi-sql-profiler/blob/main/doc/images/query_detail.png)
 
 

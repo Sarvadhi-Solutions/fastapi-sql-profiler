@@ -17,16 +17,20 @@
 
 <script>
     function clearData() {
+        // Call the API to delete all data
         fetch('/clear_db', {
             method: 'delete',
+            // Add any necessary headers or data to the request
         })
             .then(response => {
                 console.log('clearData() called', response);
                 if (response.ok) {
-                    alert("Clearing all data...");
+                    // The API call was successful
+                    // alert("Clearing all data...");
                     setTimeout(() => {
                         location.reload();
                     }, 500);
+                    // Add your code to handle the successful response
                 } else {
                     alert("Error clearing data.");
                 }
@@ -34,7 +38,6 @@
             .catch(error => {
                 alert("An error occurred while clearing data.");
             });
-
     }
 </script>
 
@@ -48,10 +51,28 @@
                     <a class="navbar-brand" href="{{ url_for('all_request') }}">Summary</a>
                 </div>
                 <div>
-                    <button class="btn btn-clear" data-bs-toggle="modal" onclick="clearData()">Clear DB</button>
+                    <button class="btn btn-clear" type="button" data-bs-toggle="modal" data-bs-target="#clearConfirmationModal">Clear DB</button>
                 </div>
             </div>
         </nav>
+
+        <div class="modal fade" id="clearConfirmationModal" tabindex="-1" aria-labelledby="clearConfirmationModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="clearConfirmationModalLabel">Clear DB</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to clear?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="clearData()">Clear</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         {% elif current_api == "request_query_details" %}
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
