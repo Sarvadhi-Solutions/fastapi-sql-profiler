@@ -48,10 +48,14 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
                 <div>
-                    <a class="navbar-brand" href="{{ url_for('all_request') }}">Summary</a>
+                    <a class="navbar-brand" href="{{ url_for('all_request') }}">All Request</a>
                 </div>
                 <div>
-                    <button class="btn btn-clear" type="button" data-bs-toggle="modal" data-bs-target="#clearConfirmationModal">Clear DB</button>
+                    {% if total_request_info %}
+                        <button class="btn btn-clear" type="button" data-bs-toggle="modal" data-bs-target="#clearConfirmationModal">Clear DB</button>
+                    {% else %}
+                        <button class="btn btn-clear">Clear DB</button>
+                    {% endif %}
                 </div>
             </div>
         </nav>

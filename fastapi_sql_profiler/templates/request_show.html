@@ -1,5 +1,16 @@
 {% extends 'base.html' %}
 
+{% block style %}
+<style>
+    .pagination {
+        display: flex;
+        justify-content: flex-end;
+    }
+    .pr-3 {
+        padding-right: 1rem; 
+    }
+</style>
+{% endblock %}
 {% block content %}
 
 <div class="row row-cols-1 row-cols-md-5 g-4 mt-2 px-4">
@@ -32,8 +43,9 @@
     {% endfor %}
 </div>
 
+{% if total_pages >= 2 %}
 <nav>
-    <ul class="pagination justify-content-center mt-4">
+    <ul class="pagination justify-content-end mt-4 pr-3">
         {% if page > 1 %}
         <li class="page-item">
             <a class="page-link" href="?page={{ page - 1 }}&limit={{ limit }}">Previous</a>
@@ -54,4 +66,5 @@
             {% endif %}
     </ul>
 </nav>
+{% endif %}
 {% endblock %}
