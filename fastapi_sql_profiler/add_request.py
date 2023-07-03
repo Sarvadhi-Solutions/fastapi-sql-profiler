@@ -16,7 +16,7 @@ templates = Jinja2Templates(directory=str(BASE_PATH / "templates"))
 
 
 @router.get("/all_request", response_class=HTMLResponse)
-async def all_request(request: Request,  page: int = 1, limit: int = 15):
+async def all_request(request: Request,  page: int = 1, limit: int = 20):
     """Get all request."""
     all_request_info = session.query(
         RequestInfo).order_by(-RequestInfo.id).all()
@@ -30,6 +30,7 @@ async def all_request(request: Request,  page: int = 1, limit: int = 15):
                                                             "page": page,
                                                             "limit": limit,
                                                             "total_pages": total_pages,
+                                                            "total_request_info":total_request_info,
                                                             }
     return templates.TemplateResponse("request_show.html", context)
 
