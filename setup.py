@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='fastapi-sql-profiler',
-    version='1.0.0',
+    version='1.0.1',
     description='Middleware for profiling and logging database queries in a Python web application',
     package_data={'fastapi_sql_profiler': ['templates/*']},
     author='Ganesh Sali',
